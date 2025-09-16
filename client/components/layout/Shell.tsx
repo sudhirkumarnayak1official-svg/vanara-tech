@@ -79,7 +79,7 @@ export function Shell({ children, onSync, webhookUrl, setWebhookUrl }: ShellProp
       <footer className="mt-10 border-t border-border/60 bg-background/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 grid sm:grid-cols-3 gap-4 items-center">
           <div className="text-xs text-muted-foreground">
-            Built with no-code tools | Ethical Surveillance | © Vanara 2025
+            Vanara System | Autonomous Surveillance | Ethical Intelligence | Powered by Solar | © 2025
           </div>
           <div className="text-center text-xs text-muted-foreground">
             Inspired by the Vanaras—forest warriors of ancient epics—our system blends invisibility with intelligence.
