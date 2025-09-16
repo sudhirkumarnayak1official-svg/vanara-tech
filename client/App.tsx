@@ -9,6 +9,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
+// Default to dark theme
+document.documentElement.classList.add("dark");
+
 const queryClient = new QueryClient();
 
 const App = () => (
