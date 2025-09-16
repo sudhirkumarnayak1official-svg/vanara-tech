@@ -12,7 +12,12 @@ export type ShellProps = {
   setActiveTab?: (tab: string) => void;
 };
 
-export function Shell({ children, onSync, webhookUrl, setWebhookUrl }: ShellProps) {
+export function Shell({
+  children,
+  onSync,
+  webhookUrl,
+  setWebhookUrl,
+}: ShellProps) {
   const [navOpen, setNavOpen] = useState(false);
 
   return (
@@ -24,17 +29,46 @@ export function Shell({ children, onSync, webhookUrl, setWebhookUrl }: ShellProp
               <Shield className="h-5 w-5" />
             </div>
             <div className="leading-tight">
-              <div className="text-lg sm:text-xl font-bold font-display neon-text">Vanara System</div>
-              <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Stealth Surveillance</div>
+              <div className="text-lg sm:text-xl font-bold font-display neon-text">
+                Vanara System
+              </div>
+              <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                Stealth Surveillance
+              </div>
             </div>
           </a>
 
           <nav className="ml-auto hidden md:flex items-center gap-2">
-            <a href="#overview" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Overview</a>
-            <a href="#detections" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Detections</a>
-            <a href="#alerts" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Alerts</a>
-            <a href="#satellite" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Satellite View</a>
-            <a href="#live" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Live Feed</a>
+            <a
+              href="#overview"
+              className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm"
+            >
+              Overview
+            </a>
+            <a
+              href="#detections"
+              className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm"
+            >
+              Detections
+            </a>
+            <a
+              href="#alerts"
+              className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm"
+            >
+              Alerts
+            </a>
+            <a
+              href="#satellite"
+              className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm"
+            >
+              Satellite View
+            </a>
+            <a
+              href="#live"
+              className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm"
+            >
+              Live Feed
+            </a>
           </nav>
 
           <button
@@ -47,11 +81,36 @@ export function Shell({ children, onSync, webhookUrl, setWebhookUrl }: ShellProp
         </div>
         {navOpen && (
           <div className="md:hidden px-4 pb-3 flex flex-col gap-1">
-            <a href="#overview" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Overview</a>
-            <a href="#detections" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Detections</a>
-            <a href="#alerts" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Alerts</a>
-            <a href="#satellite" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Satellite View</a>
-            <a href="#live" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Live Feed</a>
+            <a
+              href="#overview"
+              className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm"
+            >
+              Overview
+            </a>
+            <a
+              href="#detections"
+              className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm"
+            >
+              Detections
+            </a>
+            <a
+              href="#alerts"
+              className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm"
+            >
+              Alerts
+            </a>
+            <a
+              href="#satellite"
+              className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm"
+            >
+              Satellite View
+            </a>
+            <a
+              href="#live"
+              className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm"
+            >
+              Live Feed
+            </a>
           </div>
         )}
 
@@ -68,21 +127,27 @@ export function Shell({ children, onSync, webhookUrl, setWebhookUrl }: ShellProp
                 placeholder="Webhook URL (Google Sheets / n8n)"
                 className="w-full sm:w-[340px] h-9 px-3 rounded-md bg-secondary/70 text-sm border border-border focus:outline-none focus:ring-2 focus:ring-ring"
               />
-              <Button onClick={onSync} className="h-9">Sync Logs</Button>
+              <Button onClick={onSync} className="h-9">
+                Sync Logs
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className={cn("mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6")}>{children}</main>
+      <main className={cn("mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6")}>
+        {children}
+      </main>
 
       <footer className="mt-10 border-t border-border/60 bg-background/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 grid sm:grid-cols-3 gap-4 items-center">
           <div className="text-xs text-muted-foreground">
-            Vanara System | Autonomous Surveillance | Ethical Intelligence | Powered by Solar | © 2025
+            Vanara System | Autonomous Surveillance | Ethical Intelligence |
+            Powered by Solar | © 2025
           </div>
           <div className="text-center text-xs text-muted-foreground">
-            Inspired by the Vanaras—forest warriors of ancient epics—our system blends invisibility with intelligence.
+            Inspired by the Vanaras—forest warriors of ancient epics—our system
+            blends invisibility with intelligence.
           </div>
           <div className="sm:justify-self-end">
             <img

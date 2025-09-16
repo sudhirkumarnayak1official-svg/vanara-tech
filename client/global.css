@@ -107,12 +107,26 @@
   }
 
   html {
-    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
-      Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji",
+    font-family:
+      Inter,
+      system-ui,
+      -apple-system,
+      Segoe UI,
+      Roboto,
+      Ubuntu,
+      Cantarell,
+      Noto Sans,
+      "Helvetica Neue",
+      Arial,
+      "Apple Color Emoji",
       "Segoe UI Emoji";
   }
 
-  h1, h2, h3, h4, .font-display {
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
     font-family: Orbitron, Inter, ui-sans-serif, system-ui, sans-serif;
     letter-spacing: 0.04em;
   }
@@ -120,29 +134,51 @@
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(ellipse at top left, hsla(var(--primary)/0.08), transparent 40%),
-      radial-gradient(ellipse at bottom right, hsla(var(--primary)/0.06), transparent 40%);
+      radial-gradient(
+        ellipse at top left,
+        hsla(var(--primary) / 0.08),
+        transparent 40%
+      ),
+      radial-gradient(
+        ellipse at bottom right,
+        hsla(var(--primary) / 0.06),
+        transparent 40%
+      );
     background-attachment: fixed;
   }
 }
 
 @layer utilities {
   .neon-text {
-    text-shadow: 0 0 8px hsla(var(--primary)/0.7), 0 0 18px hsla(var(--primary)/0.4);
+    text-shadow:
+      0 0 8px hsla(var(--primary) / 0.7),
+      0 0 18px hsla(var(--primary) / 0.4);
   }
   .neon-ring {
-    box-shadow: 0 0 0 1px hsla(var(--primary)/0.35) inset, 0 0 24px hsla(var(--primary)/0.25);
+    box-shadow:
+      0 0 0 1px hsla(var(--primary) / 0.35) inset,
+      0 0 24px hsla(var(--primary) / 0.25);
   }
   .soft-panel {
     @apply rounded-xl bg-card/80 backdrop-blur border border-border shadow-[0_0_40px_-12px_hsla(var(--primary)/0.25)];
   }
   .hud-line {
-    background: linear-gradient(90deg, transparent, hsla(var(--primary)/0.6), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsla(var(--primary) / 0.6),
+      transparent
+    );
     height: 1px;
   }
   .grid-bg {
-    background-image: linear-gradient(hsla(var(--foreground)/0.06) 1px, transparent 1px),
-      linear-gradient(90deg, hsla(var(--foreground)/0.06) 1px, transparent 1px);
+    background-image:
+      linear-gradient(hsla(var(--foreground) / 0.06) 1px, transparent 1px),
+      linear-gradient(
+        90deg,
+        hsla(var(--foreground) / 0.06) 1px,
+        transparent 1px
+      );
     background-size: 24px 24px;
     background-position: -1px -1px;
   }
