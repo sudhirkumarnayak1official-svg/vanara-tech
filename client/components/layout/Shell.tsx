@@ -19,7 +19,7 @@ export function Shell({ children, onSync, webhookUrl, setWebhookUrl }: ShellProp
     <div className="min-h-screen grid-bg">
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-4">
-          <Link to="/" className="group inline-flex items-center gap-2">
+          <a href="/" className="group inline-flex items-center gap-2">
             <div className="h-8 w-8 rounded-md grid place-items-center neon-ring bg-primary/10 text-primary">
               <Shield className="h-5 w-5" />
             </div>
@@ -27,7 +27,7 @@ export function Shell({ children, onSync, webhookUrl, setWebhookUrl }: ShellProp
               <div className="text-lg sm:text-xl font-bold font-display neon-text">Vanara System</div>
               <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Stealth Surveillance</div>
             </div>
-          </Link>
+          </a>
 
           <nav className="ml-auto hidden md:flex items-center gap-2">
             <a href="#overview" className="px-3 py-2 rounded-md hover:bg-accent/50 transition text-sm">Overview</a>
