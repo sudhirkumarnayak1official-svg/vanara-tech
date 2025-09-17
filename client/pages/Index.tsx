@@ -256,21 +256,41 @@ export default function Index() {
   const simTimer = useRef<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Webhook helper
-  async function sendEvent(event: string, payload: Record<string, any>) {
-    if (!webhookUrl) return;
+  // Webhook helper (validate + safe send)
+  const canSend = useMemo(() => {
     try {
-      await fetch(webhookUrl, {
+      if (!webhookUrl) return false;
+      const u = new URL(webhookUrl);
+      return u.protocol === "https:" || u.protocol === "http:";
+    } catch {
+      return false;
+    }
+  }, [webhookUrl]);
+
+  function safeSend(url: string, body: any) {
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify(body)], { type: "application/json" });
+        navigator.sendBeacon(url, blob);
+        return;
+      }
+      fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event, payload, ts: new Date().toISOString() }),
+        body: JSON.stringify(body),
         keepalive: true,
-      });
+      }).catch(() => {});
     } catch {}
   }
+
+  async function sendEvent(event: string, payload: Record<string, any>) {
+    if (!canSend) return;
+    const body = { event, payload, ts: new Date().toISOString() };
+    safeSend(webhookUrl, body);
+  }
   function onSyncLogs() {
-    if (!webhookUrl) {
-      toast("Add a webhook URL to sync logs.");
+    if (!canSend) {
+      toast("Add a valid webhook URL (https) to sync logs.");
       return;
     }
     sendEvent("sync_logs", { bots, stations, detections, alerts });
@@ -779,7 +799,7 @@ export default function Index() {
                   alt="Bot"
                 />
               )}
-              <div className="absolute inset-0 mix-blend-screen bg-[radial-gradient(circle_at_center,hsla(var(--primary)/0.15),transparent_60%)]" />
+              <div className="absolute inset-0 mix-blend-screen bg-[url('https://cdn.builder.io/api/v1/image/assets%2Fda082bc53e124deab1e9d38bb37c399a%2F1cad17812e13495ea64525d0abf7beab')] bg-no-repeat bg-center bg-cover" />
               {vnr07?.charging && (
                 <div className="absolute bottom-3 left-3 right-3 bg-background/80 rounded-md p-2 border border-border">
                   <div className="text-xs mb-1">
