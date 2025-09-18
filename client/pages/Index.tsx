@@ -255,6 +255,11 @@ export default function Index() {
   const [anomaly, setAnomaly] = useState(false);
   const simTimer = useRef<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [liveAlert, setLiveAlert] = useState(false);
+  const [threatLogs, setThreatLogs] = useState<{id:string; botId:string; ts:string; location?:string; confidence:number; seek:number}[]>([]);
+  const scanCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const lastImage = useRef<ImageData | null>(null);
+  const lastTriggerRef = useRef<number>(0);
 
   // Webhook helper (validate + safe send)
   const canSend = useMemo(() => {
