@@ -256,7 +256,16 @@ export default function Index() {
   const simTimer = useRef<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [liveAlert, setLiveAlert] = useState(false);
-  const [threatLogs, setThreatLogs] = useState<{id:string; botId:string; ts:string; location?:string; confidence:number; seek:number}[]>([]);
+  const [threatLogs, setThreatLogs] = useState<
+    {
+      id: string;
+      botId: string;
+      ts: string;
+      location?: string;
+      confidence: number;
+      seek: number;
+    }[]
+  >([]);
   const scanCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const lastImage = useRef<ImageData | null>(null);
   const lastTriggerRef = useRef<number>(0);
@@ -275,7 +284,9 @@ export default function Index() {
   function safeSend(url: string, body: any) {
     try {
       if (navigator.sendBeacon) {
-        const blob = new Blob([JSON.stringify(body)], { type: "application/json" });
+        const blob = new Blob([JSON.stringify(body)], {
+          type: "application/json",
+        });
         navigator.sendBeacon(url, blob);
         return;
       }
@@ -451,7 +462,10 @@ export default function Index() {
       const v = videoRef.current;
       if (!v || !ctx || v.readyState < 2) return;
       const w = 160;
-      const h = Math.max(90, Math.floor((v.videoHeight / (v.videoWidth || 1)) * w) || 90);
+      const h = Math.max(
+        90,
+        Math.floor((v.videoHeight / (v.videoWidth || 1)) * w) || 90,
+      );
       cvs.width = w;
       cvs.height = h;
       ctx.drawImage(v, 0, 0, w, h);
@@ -555,12 +569,37 @@ export default function Index() {
     const ts = new Date().toISOString();
     const seek = videoRef.current?.currentTime ?? 0;
     const location = `${vnr07.lat.toFixed(4)}° N, ${vnr07.lon.toFixed(4)}° E`;
-    const entry = { id: crypto.randomUUID(), botId: vnr07.id, ts, location, confidence: +conf.toFixed(2), seek };
+    const entry = {
+      id: crypto.randomUUID(),
+      botId: vnr07.id,
+      ts,
+      location,
+      confidence: +conf.toFixed(2),
+      seek,
+    };
     setThreatLogs((l) => [entry, ...l].slice(0, 12));
-    const det: Detection = { t: ts, type: "Human Presence", conf: +conf.toFixed(2), src: "AI-Scan" };
+    const det: Detection = {
+      t: ts,
+      type: "Human Presence",
+      conf: +conf.toFixed(2),
+      src: "AI-Scan",
+    };
     setDetections((d) => [det, ...d]);
-    setAlerts((a) => [{ id: crypto.randomUUID(), msg: `Human Presence detected (${(conf * 100).toFixed(0)}%)`, t: new Date().toLocaleTimeString() }, ...a]);
-    sendEvent("human_presence_detected", { botId: vnr07.id, ts, location, confidence: +conf.toFixed(2), seek });
+    setAlerts((a) => [
+      {
+        id: crypto.randomUUID(),
+        msg: `Human Presence detected (${(conf * 100).toFixed(0)}%)`,
+        t: new Date().toLocaleTimeString(),
+      },
+      ...a,
+    ]);
+    sendEvent("human_presence_detected", {
+      botId: vnr07.id,
+      ts,
+      location,
+      confidence: +conf.toFixed(2),
+      seek,
+    });
   }
 
   function replayAt(seek: number) {
@@ -1343,10 +1382,22 @@ export default function Index() {
                 <div className="pointer-events-none absolute inset-0 bg-red-500/25 animate-pulse" />
               )}
               <div className="absolute left-3 top-3 text-xs px-2 py-1 rounded bg-background/70 border border-border">
-                {vnr07.id} · {vnr07.terrain} · Stealth {vnr07.stealth ? "ON" : "OFF"}
+                {vnr07.id} · {vnr07.terrain} · Stealth{" "}
+                {vnr07.stealth ? "ON" : "OFF"}
               </div>
-              <div className={cn("absolute right-3 top-3 text-xs px-2 py-1 rounded border neon-ring transition-opacity", liveAlert ? "bg-destructive/80 border-destructive/60 text-destructive-foreground opacity-100" : "opacity-0")}>LIVE ALERT</div>
-              <div className="absolute bottom-3 right-3 text-[10px] px-2 py-1 rounded bg-background/70 border border-border">Lat {vnr07.lat.toFixed(2)}, Lon {vnr07.lon.toFixed(2)}</div>
+              <div
+                className={cn(
+                  "absolute right-3 top-3 text-xs px-2 py-1 rounded border neon-ring transition-opacity",
+                  liveAlert
+                    ? "bg-destructive/80 border-destructive/60 text-destructive-foreground opacity-100"
+                    : "opacity-0",
+                )}
+              >
+                LIVE ALERT
+              </div>
+              <div className="absolute bottom-3 right-3 text-[10px] px-2 py-1 rounded bg-background/70 border border-border">
+                Lat {vnr07.lat.toFixed(2)}, Lon {vnr07.lon.toFixed(2)}
+              </div>
             </div>
             <div className="mt-3 flex items-center gap-2">
               <Button
