@@ -441,6 +441,45 @@ export default function Index() {
     };
   }, [simRunning]);
 
+  // AI human presence scanning for uploaded video (confidence > 0.75)
+  useEffect(() => {
+    if (!previewSrc) return;
+    const cvs = document.createElement("canvas");
+    scanCanvasRef.current = cvs;
+    const ctx = cvs.getContext("2d");
+    const id = setInterval(() => {
+      const v = videoRef.current;
+      if (!v || !ctx || v.readyState < 2) return;
+      const w = 160;
+      const h = Math.max(90, Math.floor((v.videoHeight / (v.videoWidth || 1)) * w) || 90);
+      cvs.width = w;
+      cvs.height = h;
+      ctx.drawImage(v, 0, 0, w, h);
+      const frame = ctx.getImageData(0, 0, w, h);
+      if (lastImage.current) {
+        let diffSum = 0;
+        let count = 0;
+        const a = frame.data;
+        const b = lastImage.current.data;
+        for (let i = 0; i < a.length; i += 16) {
+          const dr = a[i] - b[i];
+          const dg = a[i + 1] - b[i + 1];
+          const db = a[i + 2] - b[i + 2];
+          diffSum += Math.abs(dr) + Math.abs(dg) + Math.abs(db);
+          count++;
+        }
+        const diffAvg = diffSum / (count * 255 * 3);
+        const confidence = Math.min(0.98, Math.max(0.5, diffAvg * 2));
+        if (confidence > 0.75) triggerHuman(confidence);
+      }
+      lastImage.current = frame;
+    }, 500);
+    return () => {
+      clearInterval(id);
+      lastImage.current = null;
+    };
+  }, [previewSrc]);
+
   // Detections stream (probabilistic)
   useEffect(() => {
     const id = setInterval(() => {
