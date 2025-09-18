@@ -1339,10 +1339,14 @@ export default function Index() {
                   anomaly ? "bg-red-500/20" : "bg-transparent",
                 )}
               />
+              {liveAlert && (
+                <div className="pointer-events-none absolute inset-0 bg-red-500/25 animate-pulse" />
+              )}
               <div className="absolute left-3 top-3 text-xs px-2 py-1 rounded bg-background/70 border border-border">
-                {vnr07.id} · {vnr07.terrain} · Stealth{" "}
-                {vnr07.stealth ? "ON" : "OFF"}
+                {vnr07.id} · {vnr07.terrain} · Stealth {vnr07.stealth ? "ON" : "OFF"}
               </div>
+              <div className={cn("absolute right-3 top-3 text-xs px-2 py-1 rounded border neon-ring transition-opacity", liveAlert ? "bg-destructive/80 border-destructive/60 text-destructive-foreground opacity-100" : "opacity-0")}>LIVE ALERT</div>
+              <div className="absolute bottom-3 right-3 text-[10px] px-2 py-1 rounded bg-background/70 border border-border">Lat {vnr07.lat.toFixed(2)}, Lon {vnr07.lon.toFixed(2)}</div>
             </div>
             <div className="mt-3 flex items-center gap-2">
               <Button
