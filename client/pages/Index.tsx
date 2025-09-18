@@ -799,7 +799,6 @@ export default function Index() {
                   alt="Bot"
                 />
               )}
-              <div className="absolute inset-0 mix-blend-screen bg-[url('https://cdn.builder.io/api/v1/image/assets%2Fda082bc53e124deab1e9d38bb37c399a%2F1cad17812e13495ea64525d0abf7beab')] bg-no-repeat bg-center bg-cover" />
               {vnr07?.charging && (
                 <div className="absolute bottom-3 left-3 right-3 bg-background/80 rounded-md p-2 border border-border">
                   <div className="text-xs mb-1">
