@@ -546,6 +546,30 @@ export default function Index() {
     } catch {}
   }
 
+  function triggerHuman(conf: number) {
+    const now = Date.now();
+    if (now - lastTriggerRef.current < 5000) return;
+    lastTriggerRef.current = now;
+    setLiveAlert(true);
+    setTimeout(() => setLiveAlert(false), 2500);
+    const ts = new Date().toISOString();
+    const seek = videoRef.current?.currentTime ?? 0;
+    const location = `${vnr07.lat.toFixed(4)}° N, ${vnr07.lon.toFixed(4)}° E`;
+    const entry = { id: crypto.randomUUID(), botId: vnr07.id, ts, location, confidence: +conf.toFixed(2), seek };
+    setThreatLogs((l) => [entry, ...l].slice(0, 12));
+    const det: Detection = { t: ts, type: "Human Presence", conf: +conf.toFixed(2), src: "AI-Scan" };
+    setDetections((d) => [det, ...d]);
+    setAlerts((a) => [{ id: crypto.randomUUID(), msg: `Human Presence detected (${(conf * 100).toFixed(0)}%)`, t: new Date().toLocaleTimeString() }, ...a]);
+    sendEvent("human_presence_detected", { botId: vnr07.id, ts, location, confidence: +conf.toFixed(2), seek });
+  }
+
+  function replayAt(seek: number) {
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.max(0, seek - 0.3);
+      videoRef.current.play();
+    }
+  }
+
   function exportJSON() {
     const data = JSON.stringify(detections, null, 2);
     downloadFile(data, "detections.json", "application/json");
