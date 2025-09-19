@@ -262,6 +262,8 @@ export default function Index() {
       botId: string;
       ts: string;
       location?: string;
+      lat?: number;
+      lon?: number;
       confidence: number;
       seek: number;
     }[]
@@ -574,6 +576,8 @@ export default function Index() {
       botId: vnr07.id,
       ts,
       location,
+      lat: vnr07.lat,
+      lon: vnr07.lon,
       confidence: +conf.toFixed(2),
       seek,
     };
@@ -597,6 +601,8 @@ export default function Index() {
       botId: vnr07.id,
       ts,
       location,
+      lat: vnr07.lat,
+      lon: vnr07.lon,
       confidence: +conf.toFixed(2),
       seek,
     });
