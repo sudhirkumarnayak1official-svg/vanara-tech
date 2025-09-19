@@ -1445,32 +1445,45 @@ export default function Index() {
             </div>
           </div>
           <div className="soft-panel p-4 space-y-3">
-            <div className="text-sm text-muted-foreground">Detection Logs</div>
-            <div className="rounded-md border border-border p-3 bg-background/60 text-sm space-y-1">
-              <div>
-                Threat Type:{" "}
-                <span className="text-primary">Ammunition Transport</span>
-              </div>
-              <div>
-                Confidence Score: <span className="text-primary">0.92</span>
-              </div>
-              <div>
-                Location: {vnr07.lat.toFixed(4)}° N, {vnr07.lon.toFixed(4)}° E
-              </div>
-              <div>Timestamp: {new Date().toISOString()}</div>
-              <div>Bot ID: {vnr07.id}</div>
-              <div>Terrain: {vnr07.terrain}</div>
-              <div>Stealth Mode: {vnr07.stealth ? "ON" : "OFF"}</div>
-              <Tooltip>
-                <TooltipTrigger className="mt-2 text-xs text-primary">
-                  ℹ
-                </TooltipTrigger>
-                <TooltipContent>
-                  Vanara integrates with no-code backend tools for real-time
-                  logging and ethical transparency.
-                </TooltipContent>
-              </Tooltip>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">Threat Log Panel</div>
+              <div className={cn("text-[10px] px-2 py-0.5 rounded border", threatLogs.length ? "bg-primary/10 text-primary border-primary/40" : "bg-background/60 text-muted-foreground border-border")}>{threatLogs.length} events</div>
             </div>
+            {threatLogs.length === 0 ? (
+              <div className="rounded-md border border-border p-3 bg-background/60 text-sm text-muted-foreground">No threats yet. Upload a feed or wait for AI detection.</div>
+            ) : (
+              <ul className="space-y-2">
+                {threatLogs.map((e) => (
+                  <li key={e.id} className="rounded-md border border-border/60 bg-background/60">
+                    <div className="p-3 flex items-start gap-3">
+                      <div className="flex-1 text-sm">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/20 text-destructive border border-destructive/30">Human Presence</span>
+                          <span className="text-xs text-muted-foreground font-mono">{e.ts}</span>
+                          <span className="text-xs">Bot {e.botId}</span>
+                          <span className="text-xs">Conf {(e.confidence * 100).toFixed(0)}%</span>
+                          {e.location && <span className="text-xs">{e.location}</span>}
+                        </div>
+                      </div>
+                      <div>
+                        <Button size="sm" onClick={() => replayAt(e.seek)}>Replay</Button>
+                      </div>
+                    </div>
+                    {typeof e.lat === "number" && typeof e.lon === "number" && (
+                      <div className="px-3 pb-3">
+                        <div className="relative h-24 overflow-hidden rounded border border-border">
+                          <iframe
+                            title={`mini-map-${e.id}`}
+                            className="absolute inset-0 h-full w-full"
+                            src={`https://maps.google.com/maps?q=${e.lat},${e.lon}&z=13&output=embed`}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </section>
