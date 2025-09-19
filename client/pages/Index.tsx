@@ -472,7 +472,9 @@ export default function Index() {
 
     async function loadScript(src: string) {
       await new Promise<void>((resolve, reject) => {
-        const existing = Array.from(document.scripts).find((s) => s.src === src);
+        const existing = Array.from(document.scripts).find(
+          (s) => s.src === src,
+        );
         if (existing) return resolve();
         const s = document.createElement("script");
         s.src = src;
@@ -485,8 +487,12 @@ export default function Index() {
 
     async function ensureModel() {
       const w = window as any;
-      if (!w.tf) await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0");
-      if (!w.cocoSsd) await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd");
+      if (!w.tf)
+        await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0");
+      if (!w.cocoSsd)
+        await loadScript(
+          "https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd",
+        );
       if (!cocoModelRef.current) {
         cocoModelRef.current = await w.cocoSsd.load();
       }
@@ -498,7 +504,9 @@ export default function Index() {
       if (v && v.readyState >= 2 && cocoModelRef.current) {
         try {
           const preds = await cocoModelRef.current.detect(v);
-          const persons = preds.filter((p: any) => p.class === "person" && p.score >= 0.65);
+          const persons = preds.filter(
+            (p: any) => p.class === "person" && p.score >= 0.65,
+          );
           const now = Date.now();
           if (persons.length && now - lastCocoLogRef.current > 1200) {
             lastCocoLogRef.current = now;
@@ -512,7 +520,9 @@ export default function Index() {
     }
 
     if (previewSrc) {
-      ensureModel().then(loop).catch(() => {});
+      ensureModel()
+        .then(loop)
+        .catch(() => {});
     }
 
     return () => {
@@ -586,11 +596,15 @@ export default function Index() {
     } catch {}
   }
 
-  function registerPerson(conf: number, tsOverride?: string, seekOverride?: number) {
+  function registerPerson(
+    conf: number,
+    tsOverride?: string,
+    seekOverride?: number,
+  ) {
     setLiveAlert(true);
     setTimeout(() => setLiveAlert(false), 2500);
     const ts = tsOverride ?? new Date().toISOString();
-    const seek = seekOverride ?? (videoRef.current?.currentTime ?? 0);
+    const seek = seekOverride ?? videoRef.current?.currentTime ?? 0;
     const location = `${vnr07.lat.toFixed(4)}° N, ${vnr07.lon.toFixed(4)}° E`;
     const entry = {
       id: crypto.randomUUID(),
@@ -1483,28 +1497,56 @@ export default function Index() {
           </div>
           <div className="soft-panel p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">Threat Log Panel</div>
-              <div className={cn("text-[10px] px-2 py-0.5 rounded border", threatLogs.length ? "bg-primary/10 text-primary border-primary/40" : "bg-background/60 text-muted-foreground border-border")}>{threatLogs.length} events</div>
+              <div className="text-sm text-muted-foreground">
+                Threat Log Panel
+              </div>
+              <div
+                className={cn(
+                  "text-[10px] px-2 py-0.5 rounded border",
+                  threatLogs.length
+                    ? "bg-primary/10 text-primary border-primary/40"
+                    : "bg-background/60 text-muted-foreground border-border",
+                )}
+              >
+                {threatLogs.length} events
+              </div>
             </div>
             {threatLogs.length === 0 ? (
-              <div className="rounded-md border border-border p-3 bg-background/60 text-sm text-muted-foreground">No threats yet. Upload a feed or wait for AI detection.</div>
+              <div className="rounded-md border border-border p-3 bg-background/60 text-sm text-muted-foreground">
+                No threats yet. Upload a feed or wait for AI detection.
+              </div>
             ) : (
               <ul className="space-y-2">
                 {threatLogs.map((e) => (
-                  <li key={e.id} className="rounded-md border border-border/60 bg-background/60">
+                  <li
+                    key={e.id}
+                    className="rounded-md border border-border/60 bg-background/60"
+                  >
                     <div className="p-3 flex items-start gap-3">
                       <div className="flex-1 text-sm">
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/20 text-destructive border border-destructive/30">Human Presence</span>
-                          <span className="text-xs text-muted-foreground font-mono">{e.ts}</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/20 text-destructive border border-destructive/30">
+                            Human Presence
+                          </span>
+                          <span className="text-xs text-muted-foreground font-mono">
+                            {e.ts}
+                          </span>
                           <span className="text-xs">Bot {e.botId}</span>
-                          <span className="text-xs">Conf {(e.confidence * 100).toFixed(0)}%</span>
-                          {e.videoId && <span className="text-xs">Video {e.videoId}</span>}
-                          {e.location && <span className="text-xs">{e.location}</span>}
+                          <span className="text-xs">
+                            Conf {(e.confidence * 100).toFixed(0)}%
+                          </span>
+                          {e.videoId && (
+                            <span className="text-xs">Video {e.videoId}</span>
+                          )}
+                          {e.location && (
+                            <span className="text-xs">{e.location}</span>
+                          )}
                         </div>
                       </div>
                       <div>
-                        <Button size="sm" onClick={() => replayAt(e.seek)}>Replay</Button>
+                        <Button size="sm" onClick={() => replayAt(e.seek)}>
+                          Replay
+                        </Button>
                       </div>
                     </div>
                     {typeof e.lat === "number" && typeof e.lon === "number" && (
