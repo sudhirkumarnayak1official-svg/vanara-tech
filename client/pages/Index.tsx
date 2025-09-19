@@ -251,6 +251,15 @@ export default function Index() {
   const defaultVideo =
     "https://assets.mixkit.co/videos/preview/mixkit-trees-in-the-forest-woods-1181-large.mp4";
   const [simVideo, setSimVideo] = useState<string>(defaultVideo);
+  const [videoId, setVideoId] = useState<string>(() => {
+    try {
+      const u = new URL(defaultVideo);
+      const name = u.pathname.split("/").pop() || "default_video";
+      return name;
+    } catch {
+      return "default_video";
+    }
+  });
   const [simRunning, setSimRunning] = useState(true);
   const [anomaly, setAnomaly] = useState(false);
   const simTimer = useRef<number | null>(null);
@@ -266,11 +275,14 @@ export default function Index() {
       lon?: number;
       confidence: number;
       seek: number;
+      videoId?: string;
     }[]
   >([]);
   const scanCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const lastImage = useRef<ImageData | null>(null);
   const lastTriggerRef = useRef<number>(0);
+  const cocoModelRef = useRef<any | null>(null);
+  const lastCocoLogRef = useRef<number>(0);
 
   // Webhook helper (validate + safe send)
   const canSend = useMemo(() => {
@@ -454,45 +466,57 @@ export default function Index() {
     };
   }, [simRunning]);
 
-  // AI human presence scanning for uploaded video (confidence > 0.75)
+  // AI human detection using TensorFlow.js COCO-SSD (>= 0.65)
   useEffect(() => {
-    if (!previewSrc) return;
-    const cvs = document.createElement("canvas");
-    scanCanvasRef.current = cvs;
-    const ctx = cvs.getContext("2d");
-    const id = setInterval(() => {
-      const v = videoRef.current;
-      if (!v || !ctx || v.readyState < 2) return;
-      const w = 160;
-      const h = Math.max(
-        90,
-        Math.floor((v.videoHeight / (v.videoWidth || 1)) * w) || 90,
-      );
-      cvs.width = w;
-      cvs.height = h;
-      ctx.drawImage(v, 0, 0, w, h);
-      const frame = ctx.getImageData(0, 0, w, h);
-      if (lastImage.current) {
-        let diffSum = 0;
-        let count = 0;
-        const a = frame.data;
-        const b = lastImage.current.data;
-        for (let i = 0; i < a.length; i += 16) {
-          const dr = a[i] - b[i];
-          const dg = a[i + 1] - b[i + 1];
-          const db = a[i + 2] - b[i + 2];
-          diffSum += Math.abs(dr) + Math.abs(dg) + Math.abs(db);
-          count++;
-        }
-        const diffAvg = diffSum / (count * 255 * 3);
-        const confidence = Math.min(0.98, Math.max(0.5, diffAvg * 2));
-        if (confidence > 0.75) triggerHuman(confidence);
+    let cancelled = false;
+
+    async function loadScript(src: string) {
+      await new Promise<void>((resolve, reject) => {
+        const existing = Array.from(document.scripts).find((s) => s.src === src);
+        if (existing) return resolve();
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error(`Failed to load ${src}`));
+        document.head.appendChild(s);
+      });
+    }
+
+    async function ensureModel() {
+      const w = window as any;
+      if (!w.tf) await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0");
+      if (!w.cocoSsd) await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd");
+      if (!cocoModelRef.current) {
+        cocoModelRef.current = await w.cocoSsd.load();
       }
-      lastImage.current = frame;
-    }, 500);
+    }
+
+    async function loop() {
+      if (cancelled) return;
+      const v = videoRef.current;
+      if (v && v.readyState >= 2 && cocoModelRef.current) {
+        try {
+          const preds = await cocoModelRef.current.detect(v);
+          const persons = preds.filter((p: any) => p.class === "person" && p.score >= 0.65);
+          const now = Date.now();
+          if (persons.length && now - lastCocoLogRef.current > 1200) {
+            lastCocoLogRef.current = now;
+            const ts = new Date().toISOString();
+            const seek = v.currentTime ?? 0;
+            persons.forEach((p: any) => registerPerson(p.score, ts, seek));
+          }
+        } catch {}
+      }
+      if (!cancelled) requestAnimationFrame(loop);
+    }
+
+    if (previewSrc) {
+      ensureModel().then(loop).catch(() => {});
+    }
+
     return () => {
-      clearInterval(id);
-      lastImage.current = null;
+      cancelled = true;
     };
   }, [previewSrc]);
 
@@ -562,14 +586,11 @@ export default function Index() {
     } catch {}
   }
 
-  function triggerHuman(conf: number) {
-    const now = Date.now();
-    if (now - lastTriggerRef.current < 5000) return;
-    lastTriggerRef.current = now;
+  function registerPerson(conf: number, tsOverride?: string, seekOverride?: number) {
     setLiveAlert(true);
     setTimeout(() => setLiveAlert(false), 2500);
-    const ts = new Date().toISOString();
-    const seek = videoRef.current?.currentTime ?? 0;
+    const ts = tsOverride ?? new Date().toISOString();
+    const seek = seekOverride ?? (videoRef.current?.currentTime ?? 0);
     const location = `${vnr07.lat.toFixed(4)}° N, ${vnr07.lon.toFixed(4)}° E`;
     const entry = {
       id: crypto.randomUUID(),
@@ -580,13 +601,14 @@ export default function Index() {
       lon: vnr07.lon,
       confidence: +conf.toFixed(2),
       seek,
+      videoId,
     };
-    setThreatLogs((l) => [entry, ...l].slice(0, 12));
+    setThreatLogs((l) => [entry, ...l].slice(0, 24));
     const det: Detection = {
       t: ts,
       type: "Human Presence",
       conf: +conf.toFixed(2),
-      src: "AI-Scan",
+      src: "AI-COCO",
     };
     setDetections((d) => [det, ...d]);
     setAlerts((a) => [
@@ -605,7 +627,15 @@ export default function Index() {
       lon: vnr07.lon,
       confidence: +conf.toFixed(2),
       seek,
+      videoId,
     });
+  }
+
+  function triggerHuman(conf: number) {
+    const now = Date.now();
+    if (now - lastTriggerRef.current < 1200) return;
+    lastTriggerRef.current = now;
+    registerPerson(conf);
   }
 
   function replayAt(seek: number) {
@@ -858,6 +888,7 @@ export default function Index() {
                       const url = URL.createObjectURL(f);
                       setPreviewSrc(url);
                       setSimVideo(url);
+                      setVideoId(f.name || "uploaded_video");
                       setSimRunning(true);
                     }
                   }}
@@ -1468,6 +1499,7 @@ export default function Index() {
                           <span className="text-xs text-muted-foreground font-mono">{e.ts}</span>
                           <span className="text-xs">Bot {e.botId}</span>
                           <span className="text-xs">Conf {(e.confidence * 100).toFixed(0)}%</span>
+                          {e.videoId && <span className="text-xs">Video {e.videoId}</span>}
                           {e.location && <span className="text-xs">{e.location}</span>}
                         </div>
                       </div>
